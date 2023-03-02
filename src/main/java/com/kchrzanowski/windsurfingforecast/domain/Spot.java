@@ -31,6 +31,9 @@ public class Spot {
         this.longitude = longitude;
     }
 
+    public Spot() {
+    }
+
     public Long getId() {
         return id;
     }

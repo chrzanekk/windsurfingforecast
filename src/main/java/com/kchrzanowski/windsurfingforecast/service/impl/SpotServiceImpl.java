@@ -40,4 +40,22 @@ public class SpotServiceImpl implements SpotService {
         Optional<Spot> optionalSpot = spotRepository.findById(id);
         return spotMapper.toDto(optionalSpot.orElseThrow(() -> new SpotNotFoundException(SPOT_NOT_FOUND + ": " + id)));
     }
+
+    @Override
+    public SpotDTO addNew(SpotDTO spotDTO) {
+        log.debug("Add new spot : {}", spotDTO);
+        return spotMapper.toDto(spotRepository.save(spotMapper.toEntity(spotDTO)));
+    }
+
+    @Override
+    public SpotDTO update(SpotDTO spotDTO) {
+        log.debug("Update spot : {}", spotDTO);
+        return spotMapper.toDto(spotRepository.save(spotMapper.toEntity(spotDTO)));
+    }
+
+    @Override
+    public void delete(Long id) {
+        log.debug("Delete spot : {}", id);
+        spotRepository.deleteSpotById(id);
+    }
 }

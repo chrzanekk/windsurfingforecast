@@ -5,11 +5,13 @@ import com.kchrzanowski.windsurfingforecast.exception.SpotNotFoundException;
 import com.kchrzanowski.windsurfingforecast.repository.SpotRepository;
 import com.kchrzanowski.windsurfingforecast.service.SpotService;
 import com.kchrzanowski.windsurfingforecast.service.dto.SpotDTO;
+import com.kchrzanowski.windsurfingforecast.service.dto.response.SpotResponse;
 import com.kchrzanowski.windsurfingforecast.service.mapper.SpotMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,4 +60,12 @@ public class SpotServiceImpl implements SpotService {
         log.debug("Delete spot : {}", id);
         spotRepository.deleteSpotById(id);
     }
+
+    @Override
+    public SpotResponse getBestSpots(LocalDate date) {
+//        todo implement logic for get forecast for spots puted in enum and choose best spots to response.
+        return null;
+    }
+
+
 }

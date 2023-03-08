@@ -1,5 +1,7 @@
 package com.kchrzanowski.windsurfingforecast.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 public class ForecastDTO {
@@ -7,7 +9,7 @@ public class ForecastDTO {
     private Float windSpeed;
     private Float averageTemperature;
 
-    public ForecastDTO(Float windSpeed, Float averageTemperature) {
+    public ForecastDTO(@JsonProperty("wind_spd") Float windSpeed,@JsonProperty("temp") Float averageTemperature) {
         this.windSpeed = windSpeed;
         this.averageTemperature = averageTemperature;
     }

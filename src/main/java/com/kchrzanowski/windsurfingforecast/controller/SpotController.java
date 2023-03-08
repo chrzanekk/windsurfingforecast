@@ -1,8 +1,7 @@
 package com.kchrzanowski.windsurfingforecast.controller;
 
 import com.kchrzanowski.windsurfingforecast.service.SpotService;
-import com.kchrzanowski.windsurfingforecast.service.dto.SpotDTO;
-import com.kchrzanowski.windsurfingforecast.service.dto.response.SpotResponse;
+import com.kchrzanowski.windsurfingforecast.service.response.SpotResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/forecast")

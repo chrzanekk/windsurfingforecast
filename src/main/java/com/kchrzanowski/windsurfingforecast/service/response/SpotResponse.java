@@ -1,4 +1,4 @@
-package com.kchrzanowski.windsurfingforecast.service.dto.response;
+package com.kchrzanowski.windsurfingforecast.service.response;
 
 import com.kchrzanowski.windsurfingforecast.service.dto.ForecastDTO;
 

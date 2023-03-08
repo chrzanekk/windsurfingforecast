@@ -5,7 +5,7 @@ import com.kchrzanowski.windsurfingforecast.exception.SpotNotFoundException;
 import com.kchrzanowski.windsurfingforecast.repository.SpotRepository;
 import com.kchrzanowski.windsurfingforecast.service.SpotService;
 import com.kchrzanowski.windsurfingforecast.service.dto.SpotDTO;
-import com.kchrzanowski.windsurfingforecast.service.dto.response.SpotResponse;
+import com.kchrzanowski.windsurfingforecast.service.response.SpotResponse;
 import com.kchrzanowski.windsurfingforecast.service.mapper.SpotMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

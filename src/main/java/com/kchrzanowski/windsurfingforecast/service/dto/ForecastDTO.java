@@ -2,16 +2,20 @@ package com.kchrzanowski.windsurfingforecast.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class ForecastDTO {
 
     private Float windSpeed;
     private Float averageTemperature;
+    private LocalDate dateTime;
 
-    public ForecastDTO(@JsonProperty("wind_spd") Float windSpeed,@JsonProperty("temp") Float averageTemperature) {
+    public ForecastDTO(@JsonProperty("wind_spd") Float windSpeed,@JsonProperty("temp") Float averageTemperature,
+                       @JsonProperty("localDate") LocalDate dateTime) {
         this.windSpeed = windSpeed;
         this.averageTemperature = averageTemperature;
+        this.dateTime = dateTime;
     }
 
     public ForecastDTO() {
@@ -20,11 +24,13 @@ public class ForecastDTO {
     private ForecastDTO(Builder builder) {
         windSpeed = builder.windSpeed;
         averageTemperature = builder.averageTemperature;
+        dateTime = builder.dateTime;
     }
 
     public static Builder builder() {
         return new Builder();
     }
+
 
     public Float getWindSpeed() {
         return windSpeed;
@@ -32,6 +38,10 @@ public class ForecastDTO {
 
     public Float getAverageTemperature() {
         return averageTemperature;
+    }
+
+    public LocalDate getDateTime() {
+        return dateTime;
     }
 
     @Override
@@ -64,6 +74,7 @@ public class ForecastDTO {
     public static final class Builder {
         private Float windSpeed;
         private Float averageTemperature;
+        private LocalDate dateTime;
 
         private Builder() {
         }
@@ -75,6 +86,11 @@ public class ForecastDTO {
 
         public Builder averageTemperature(Float averageTemperature) {
             this.averageTemperature = averageTemperature;
+            return this;
+        }
+
+        public Builder dateTime(LocalDate dateTime) {
+            this.dateTime = dateTime;
             return this;
         }
 

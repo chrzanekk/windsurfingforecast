@@ -1,5 +1,6 @@
 package com.kchrzanowski.windsurfingforecast.service.impl;
 
+import com.kchrzanowski.windsurfingforecast.exception.ForecastNotFoundException;
 import com.kchrzanowski.windsurfingforecast.service.ForecastService;
 import com.kchrzanowski.windsurfingforecast.service.dto.ForecastDTO;
 import com.kchrzanowski.windsurfingforecast.service.dto.SpotDTO;
@@ -17,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -37,11 +39,19 @@ public class ForecastServiceImpl implements ForecastService {
     }
 
     @Override
-    public ForecastDTO getForecast(SpotDTO spotDTO, LocalDate localDate) {
+    public ForecastResponse getForecast(SpotDTO spotDTO, LocalDate localDate) {
+        log.debug("Request to get forecast for spot by date: {}{}", spotDTO, localDate);
         ForecastResponse forecastResponse = getForecastList(spotDTO);
-//        todo stream returned list and filter data by given localDate and return;
-
-        return null;
+        String spotName = forecastResponse.getCityName();
+        List<ForecastDTO> forecastDTOList = forecastResponse.getData();
+        List<ForecastDTO> result =
+                forecastDTOList.stream().filter(forecastDTO -> forecastDTO.getDateTime().isEqual(localDate)
+                ).toList();
+        if (!result.isEmpty()) {
+            return ForecastResponse.builder().cityName(forecastResponse.getCityName()).data(result).build();
+        } else {
+            throw new ForecastNotFoundException("Forecast not found or wrong date: " + localDate.toString());
+        }
     }
 
     private ForecastResponse getForecastList(SpotDTO spotDTO) {

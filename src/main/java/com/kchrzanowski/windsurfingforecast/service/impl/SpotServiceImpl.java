@@ -3,17 +3,22 @@ package com.kchrzanowski.windsurfingforecast.service.impl;
 import com.kchrzanowski.windsurfingforecast.domain.Spot;
 import com.kchrzanowski.windsurfingforecast.exception.SpotNotFoundException;
 import com.kchrzanowski.windsurfingforecast.repository.SpotRepository;
+import com.kchrzanowski.windsurfingforecast.service.ForecastService;
 import com.kchrzanowski.windsurfingforecast.service.SpotService;
+import com.kchrzanowski.windsurfingforecast.service.dto.ForecastDTO;
 import com.kchrzanowski.windsurfingforecast.service.dto.SpotDTO;
-import com.kchrzanowski.windsurfingforecast.service.response.SpotResponse;
 import com.kchrzanowski.windsurfingforecast.service.mapper.SpotMapper;
+import com.kchrzanowski.windsurfingforecast.service.response.ForecastResponse;
+import com.kchrzanowski.windsurfingforecast.service.response.SpotResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SpotServiceImpl implements SpotService {
@@ -25,9 +30,12 @@ public class SpotServiceImpl implements SpotService {
     private final SpotRepository spotRepository;
     private final SpotMapper spotMapper;
 
-    public SpotServiceImpl(SpotRepository spotRepository, SpotMapper spotMapper) {
+    private final ForecastService forecastService;
+
+    public SpotServiceImpl(SpotRepository spotRepository, SpotMapper spotMapper, ForecastService forecastService) {
         this.spotRepository = spotRepository;
         this.spotMapper = spotMapper;
+        this.forecastService = forecastService;
     }
 
     @Override
@@ -63,8 +71,20 @@ public class SpotServiceImpl implements SpotService {
 
     @Override
     public SpotResponse getBestSpots(LocalDate date) {
-//        todo implement logic for get forecast for spots puted in enum and choose best spots to response.
+        Map<String, ForecastDTO> allSpotsByDate = getAllSpotsByDate(date);
+//todo implement logic to find best spot from recieved data
         return null;
+    }
+
+    private Map<String, ForecastDTO> getAllSpotsByDate(LocalDate date) {
+        List<SpotDTO> spotDTOList = spotMapper.toDto(spotRepository.findAll());
+        return convertListOfForecastToMap(spotDTOList.stream().map(spotDTO -> forecastService.getForecast(spotDTO,
+                date)).toList());
+    }
+
+    private Map<String, ForecastDTO> convertListOfForecastToMap(List<ForecastResponse> forecastResponses) {
+        return forecastResponses.stream().collect(Collectors.toMap(ForecastResponse::getCityName,
+                forecastResponse -> forecastResponse.getData().get(0)));
     }
 
 

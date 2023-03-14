@@ -29,7 +29,7 @@ public class SpotController {
                                                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                  LocalDate date ) {
         log.debug("REST request to get best spots for windsurfers for date: {}", date.toString());
-        SpotResponse spotResponse = spotService.getBestSpots(date);
+        SpotResponse spotResponse = spotService.getBestSpot(date);
         return ResponseEntity.ok().body(spotResponse);
     }
 

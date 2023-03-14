@@ -13,6 +13,6 @@ public interface SpotService {
     List<SpotDTO> getAllSpots();
     SpotDTO getSpotById(Long id);
     void delete(Long id);
-    SpotResponse getBestSpots(LocalDate date);
+    SpotResponse getBestSpot(LocalDate date);
 
 }

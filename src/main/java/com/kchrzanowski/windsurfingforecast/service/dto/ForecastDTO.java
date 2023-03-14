@@ -11,6 +11,8 @@ public class ForecastDTO {
     private Float averageTemperature;
     private LocalDate dateTime;
 
+    private Float spotScoring;
+
     public ForecastDTO(@JsonProperty("wind_spd") Float windSpeed,@JsonProperty("temp") Float averageTemperature,
                        @JsonProperty("localDate") LocalDate dateTime) {
         this.windSpeed = windSpeed;
@@ -25,6 +27,7 @@ public class ForecastDTO {
         windSpeed = builder.windSpeed;
         averageTemperature = builder.averageTemperature;
         dateTime = builder.dateTime;
+        spotScoring = builder.spotScoring;
     }
 
     public static Builder builder() {
@@ -44,6 +47,10 @@ public class ForecastDTO {
         return dateTime;
     }
 
+    public Float getSpotScoring() {
+        return spotScoring;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,13 +59,18 @@ public class ForecastDTO {
         ForecastDTO that = (ForecastDTO) o;
 
         if (!Objects.equals(windSpeed, that.windSpeed)) return false;
-        return Objects.equals(averageTemperature, that.averageTemperature);
+        if (!Objects.equals(averageTemperature, that.averageTemperature))
+            return false;
+        if (!Objects.equals(dateTime, that.dateTime)) return false;
+        return Objects.equals(spotScoring, that.spotScoring);
     }
 
     @Override
     public int hashCode() {
         int result = windSpeed != null ? windSpeed.hashCode() : 0;
         result = 31 * result + (averageTemperature != null ? averageTemperature.hashCode() : 0);
+        result = 31 * result + (dateTime != null ? dateTime.hashCode() : 0);
+        result = 31 * result + (spotScoring != null ? spotScoring.hashCode() : 0);
         return result;
     }
 
@@ -67,6 +79,8 @@ public class ForecastDTO {
         return "ForecastDTO{" +
                 "windSpeed=" + windSpeed +
                 ", averageTemperature=" + averageTemperature +
+                ", dateTime=" + dateTime +
+                ", spotScoring=" + spotScoring +
                 '}';
     }
 
@@ -75,6 +89,7 @@ public class ForecastDTO {
         private Float windSpeed;
         private Float averageTemperature;
         private LocalDate dateTime;
+        private Float spotScoring;
 
         private Builder() {
         }
@@ -91,6 +106,11 @@ public class ForecastDTO {
 
         public Builder dateTime(LocalDate dateTime) {
             this.dateTime = dateTime;
+            return this;
+        }
+
+        public Builder spotScoring(Float spotScoring) {
+            this.spotScoring = spotScoring;
             return this;
         }
 

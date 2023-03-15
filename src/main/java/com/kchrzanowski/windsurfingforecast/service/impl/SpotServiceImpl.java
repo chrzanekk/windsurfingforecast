@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 public class SpotServiceImpl implements SpotService {
 
     private static final String SPOT_NOT_FOUND = "Spot not found";
-    private static final Float MIN_AVG_TEMPERATURE = 5f;
-    private static final Float MAX_AVG_TEMPERATURE = 35f;
-    private static final Float MIN_WIND_SPEED = 5f;
-    private static final Float MAX_WIND_SPEED = 35f;
+    private static final Float MIN_AVG_TEMPERATURE = 10f;
+    private static final Float MAX_AVG_TEMPERATURE = 15f;
+    private static final Float MIN_WIND_SPEED = 10f;
+    private static final Float MAX_WIND_SPEED = 18f;
 
     private final Logger log = LoggerFactory.getLogger(SpotServiceImpl.class);
 
@@ -74,24 +74,20 @@ public class SpotServiceImpl implements SpotService {
     @Override
     public SpotResponse getBestSpot(LocalDate date) {
         Map<String, ForecastDTO> allSpotsByDate = getAllSpotsByDate(date);
+        Map<String, ForecastDTO> allSpotsWithScoring = calculateSpotsScoring(allSpotsByDate);
         Map<String, ForecastDTO> bestSpots = findSpotsWithMatchingForecastRequirements(allSpotsByDate);
         return calculateBestSpot(bestSpots);
     }
 
     private SpotResponse calculateBestSpot(Map<String, ForecastDTO> bestSpots) {
         if (bestSpots.entrySet().size() != 1) {
-            return handleOneBestSpot(bestSpots);
+            return findSpotWithBestScoring(bestSpots);
         } else {
             Map.Entry<String, ForecastDTO> entry = bestSpots.entrySet().iterator().next();
             String spotName = entry.getKey();
             ForecastDTO spotForecastDTO = entry.getValue();
             return SpotResponse.builder().spotName(spotName).forecastDTO(spotForecastDTO).build();
         }
-    }
-
-    private SpotResponse handleOneBestSpot(Map<String, ForecastDTO> bestSpots) {
-        Map<String, ForecastDTO> bestSpotsWithScoring = calculateSpotsScoring(bestSpots);
-        return findSpotWithBestScoring(bestSpotsWithScoring);
     }
 
     private <K, V extends Comparable<Float>> SpotResponse findSpotWithBestScoring(Map<String, ForecastDTO> bestSpotsWithScoring) {
@@ -106,15 +102,15 @@ public class SpotServiceImpl implements SpotService {
        }
     }
 
-    private Map<String, ForecastDTO> calculateSpotsScoring(Map<String, ForecastDTO> bestSpots) {
-        bestSpots.entrySet().forEach(entry ->
+    private Map<String, ForecastDTO> calculateSpotsScoring(Map<String, ForecastDTO> spots) {
+        spots.entrySet().forEach(entry ->
                 entry.setValue(
                         ForecastDTO.builder()
                                 .averageTemperature(entry.getValue().getAverageTemperature())
                                 .windSpeed(entry.getValue().getWindSpeed())
                                 .dateTime(entry.getValue().getDateTime())
                                 .spotScoring(calculateSpotScoring(entry.getValue())).build()));
-        return bestSpots;
+        return spots;
     }
 
     private Map<String, ForecastDTO> getAllSpotsByDate(LocalDate date) {
@@ -135,7 +131,8 @@ public class SpotServiceImpl implements SpotService {
     }
 
     private boolean checkIfForecastIsGoodForSurfing(ForecastDTO forecastDTO) {
-        return checkIfAverageTemperatureIsGoodForSurfing(forecastDTO.getAverageTemperature()) && checkIfWindSpeedIsGoodForSurfing(forecastDTO.getWindSpeed());
+        return checkIfAverageTemperatureIsGoodForSurfing(forecastDTO.getAverageTemperature())
+                && checkIfWindSpeedIsGoodForSurfing(forecastDTO.getWindSpeed());
     }
 
     private boolean checkIfAverageTemperatureIsGoodForSurfing(Float temperature) {
@@ -147,7 +144,7 @@ public class SpotServiceImpl implements SpotService {
     }
 
     private boolean checkIfValueIsOutOfGivenRange(Float value, Float firstGivenValue, Float secondGivenValue) {
-        return value.compareTo(firstGivenValue) < 0 && value.compareTo(secondGivenValue) > 0;
+        return value.compareTo(firstGivenValue) < 0 || value.compareTo(secondGivenValue) > 0;
     }
 
     private Float calculateSpotScoring(ForecastDTO forecastDTO) {

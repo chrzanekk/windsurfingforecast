@@ -24,7 +24,7 @@ public class SpotController {
         this.spotService = spotService;
     }
 
-    @GetMapping(path = "/all")
+    @GetMapping(path = "/spot")
     public ResponseEntity<SpotResponse> getBestSurfingSpots(@RequestParam(value = "date")
                                                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                  LocalDate date ) {

@@ -14,7 +14,7 @@ public class ForecastDTO {
     private Float spotScoring;
 
     public ForecastDTO(@JsonProperty("wind_spd") Float windSpeed,@JsonProperty("temp") Float averageTemperature,
-                       @JsonProperty("localDate") LocalDate dateTime) {
+                       @JsonProperty("datetime") LocalDate dateTime) {
         this.windSpeed = windSpeed;
         this.averageTemperature = averageTemperature;
         this.dateTime = dateTime;

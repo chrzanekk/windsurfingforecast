@@ -25,6 +25,6 @@ spring:
 
 
 forecast:
-    baseApiUrl: "https://api.weatherbit.io/v2.0/forecast/"
+    baseApiUrl: "http://api.weatherbit.io/v2.0/forecast/daily"
 #    here you should provide your API key for https://www.weatherbit.io/
-    apiKey: ""
+    apiKey: "f4c266aed73945afaed9c8a194d4db42"

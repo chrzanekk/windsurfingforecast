@@ -24,9 +24,9 @@ import java.util.Map;
 @Service
 public class ForecastServiceImpl implements ForecastService {
 
-    @Value("{forecast.baseApiUrl}")
+    @Value("${forecast.baseApiUrl}")
     private String apiUrl;
-    @Value("{forecast.apiKey}")
+    @Value("${forecast.apiKey}")
     private String apiKey;
 
 

@@ -10,6 +10,7 @@ import com.kchrzanowski.windsurfingforecast.service.dto.SpotDTO;
 import com.kchrzanowski.windsurfingforecast.service.mapper.SpotMapper;
 import com.kchrzanowski.windsurfingforecast.service.response.ForecastResponse;
 import com.kchrzanowski.windsurfingforecast.service.response.SpotResponse;
+import com.kchrzanowski.windsurfingforecast.util.SpotUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,12 +32,17 @@ public class SpotServiceImpl implements SpotService {
 
     private final SpotRepository spotRepository;
     private final SpotMapper spotMapper;
-
+    private final SpotUtil spotUtil;
     private final ForecastService forecastService;
 
     public SpotServiceImpl(SpotRepository spotRepository, SpotMapper spotMapper, ForecastService forecastService) {
         this.spotRepository = spotRepository;
         this.spotMapper = spotMapper;
+        this.spotUtil = SpotUtil.builder().
+                        minAvgTemperature(MIN_AVG_TEMPERATURE).
+                        maxAvgTemperature(MAX_AVG_TEMPERATURE).
+                        minWindSpeed(MIN_WIND_SPEED).
+                        maxWindSpeed(MAX_WIND_SPEED).build();
         this.forecastService = forecastService;
     }
 
@@ -74,43 +80,9 @@ public class SpotServiceImpl implements SpotService {
     @Override
     public SpotResponse getBestSpot(LocalDate date) {
         Map<String, ForecastDTO> allSpotsByDate = getAllSpotsByDate(date);
-        Map<String, ForecastDTO> allSpotsWithScoring = calculateSpotsScoring(allSpotsByDate);
-        Map<String, ForecastDTO> bestSpots = findSpotsWithMatchingForecastRequirements(allSpotsByDate);
-        return calculateBestSpot(bestSpots);
-    }
-
-    private SpotResponse calculateBestSpot(Map<String, ForecastDTO> bestSpots) {
-        if (bestSpots.entrySet().size() != 1) {
-            return findSpotWithBestScoring(bestSpots);
-        } else {
-            Map.Entry<String, ForecastDTO> entry = bestSpots.entrySet().iterator().next();
-            String spotName = entry.getKey();
-            ForecastDTO spotForecastDTO = entry.getValue();
-            return SpotResponse.builder().spotName(spotName).forecastDTO(spotForecastDTO).build();
-        }
-    }
-
-    private <K, V extends Comparable<Float>> SpotResponse findSpotWithBestScoring(Map<String, ForecastDTO> bestSpotsWithScoring) {
-       Optional<Map.Entry<String, ForecastDTO>> optionalMaxEntry = bestSpotsWithScoring.entrySet()
-               .stream()
-               .max(Comparator.comparing(entry -> entry.getValue().getSpotScoring()));
-       if(optionalMaxEntry.isPresent()) {
-            Map.Entry<String, ForecastDTO> maxEntry = optionalMaxEntry.get();
-           return SpotResponse.builder().spotName(maxEntry.getKey()).forecastDTO(maxEntry.getValue()).build();
-       } else {
-           throw new SpotNotFoundException("Best spot not found");
-       }
-    }
-
-    private Map<String, ForecastDTO> calculateSpotsScoring(Map<String, ForecastDTO> spots) {
-        spots.entrySet().forEach(entry ->
-                entry.setValue(
-                        ForecastDTO.builder()
-                                .averageTemperature(entry.getValue().getAverageTemperature())
-                                .windSpeed(entry.getValue().getWindSpeed())
-                                .dateTime(entry.getValue().getDateTime())
-                                .spotScoring(calculateSpotScoring(entry.getValue())).build()));
-        return spots;
+        Map<String, ForecastDTO> allSpotsWithScoring = spotUtil.calculateSpotsScoring(allSpotsByDate);
+        Map<String, ForecastDTO> bestSpots = spotUtil.findSpotsWithMatchingForecastRequirements(allSpotsByDate);
+        return spotUtil.calculateBestSpot(bestSpots);
     }
 
     private Map<String, ForecastDTO> getAllSpotsByDate(LocalDate date) {
@@ -123,33 +95,5 @@ public class SpotServiceImpl implements SpotService {
         return forecastResponses.stream().collect(Collectors.toMap(ForecastResponse::getCityName,
                 forecastResponse -> forecastResponse.getData().get(0)));
     }
-
-    private Map<String, ForecastDTO> findSpotsWithMatchingForecastRequirements(Map<String, ForecastDTO> allSpots) {
-        return allSpots.entrySet().stream()
-                .filter(forecast -> checkIfForecastIsGoodForSurfing(forecast.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    private boolean checkIfForecastIsGoodForSurfing(ForecastDTO forecastDTO) {
-        return checkIfAverageTemperatureIsGoodForSurfing(forecastDTO.getAverageTemperature())
-                && checkIfWindSpeedIsGoodForSurfing(forecastDTO.getWindSpeed());
-    }
-
-    private boolean checkIfAverageTemperatureIsGoodForSurfing(Float temperature) {
-        return checkIfValueIsOutOfGivenRange(temperature, MIN_AVG_TEMPERATURE, MAX_AVG_TEMPERATURE);
-    }
-
-    private boolean checkIfWindSpeedIsGoodForSurfing(Float temperature) {
-        return checkIfValueIsOutOfGivenRange(temperature, MIN_WIND_SPEED, MAX_WIND_SPEED);
-    }
-
-    private boolean checkIfValueIsOutOfGivenRange(Float value, Float firstGivenValue, Float secondGivenValue) {
-        return value.compareTo(firstGivenValue) < 0 || value.compareTo(secondGivenValue) > 0;
-    }
-
-    private Float calculateSpotScoring(ForecastDTO forecastDTO) {
-        return (forecastDTO.getWindSpeed() * 3f) + forecastDTO.getAverageTemperature();
-    }
-
 
 }

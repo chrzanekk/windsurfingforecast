@@ -9,6 +9,14 @@ public class SpotResponse {
     private String spotName;
     private ForecastDTO forecastDTO;
 
+    public SpotResponse(String spotName, ForecastDTO forecastDTO) {
+        this.spotName = spotName;
+        this.forecastDTO = forecastDTO;
+    }
+
+    public SpotResponse() {
+    }
+
     private SpotResponse(Builder builder) {
         spotName = builder.spotName;
         forecastDTO = builder.forecastDTO;

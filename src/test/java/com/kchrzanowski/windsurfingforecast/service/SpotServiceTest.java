@@ -3,14 +3,19 @@ package com.kchrzanowski.windsurfingforecast.service;
 import com.kchrzanowski.windsurfingforecast.WindsurfingforecastApplication;
 import com.kchrzanowski.windsurfingforecast.repository.SpotRepository;
 import com.kchrzanowski.windsurfingforecast.service.dto.SpotDTO;
+import com.kchrzanowski.windsurfingforecast.service.impl.ForecastServiceImpl;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -18,7 +23,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = WindsurfingforecastApplication.class)
-public class SpotServiceIT {
+public class SpotServiceTest {
 
     @Autowired
     private SpotService spotService;
@@ -27,10 +32,18 @@ public class SpotServiceIT {
     @Autowired
     private SpotRepository spotRepository;
 
+    @Mock
+    private ForecastServiceImpl forecastServiceImpl;
+    @Mock
+    private RestTemplate restTemplate;
+
+
+
     @BeforeEach
     public void init() {
         spotRepository.deleteAll();
         spotServiceFixture.createSpot();
+        forecastServiceImpl = new ForecastServiceImpl(restTemplate);
     }
 
     @Test
@@ -104,4 +117,6 @@ public class SpotServiceIT {
 
         assertThat(sizeBeforeTest - 1).isEqualTo(sizeAfterTest);
     }
+
+
 }

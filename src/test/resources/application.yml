@@ -22,3 +22,9 @@ spring:
       path: /h2-console
       settings.trace: false
       settings.web-allow-others: false
+
+
+forecast:
+  baseApiUrl: "http://api.weatherbit.io/v2.0/forecast/daily"
+  #    here you should provide your API key for https://www.weatherbit.io/
+  apiKey: ""

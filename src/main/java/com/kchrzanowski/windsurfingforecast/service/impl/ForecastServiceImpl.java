@@ -52,7 +52,7 @@ public class ForecastServiceImpl implements ForecastService {
         }
     }
 
-    private static List<ForecastDTO> getForecastListByDate(LocalDate localDate, List<ForecastDTO> forecastDTOList) {
+    private List<ForecastDTO> getForecastListByDate(LocalDate localDate, List<ForecastDTO> forecastDTOList) {
         if (isForecastListPresent(forecastDTOList)) {
             return forecastDTOList.stream().filter(forecastDTO -> forecastDTO.getDateTime().isEqual(localDate)
             ).toList();

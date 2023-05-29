@@ -34,6 +34,15 @@ public class ForecastDTO {
         return new Builder();
     }
 
+    public static Builder builder(ForecastDTO copy) {
+        Builder builder = new Builder();
+        builder.windSpeed = copy.getWindSpeed();
+        builder.averageTemperature = copy.getAverageTemperature();
+        builder.dateTime = copy.getDateTime();
+        builder.spotScoring = copy.getSpotScoring();
+        return builder;
+    }
+
 
     public Float getWindSpeed() {
         return windSpeed;

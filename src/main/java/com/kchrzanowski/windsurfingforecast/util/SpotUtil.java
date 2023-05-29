@@ -33,9 +33,7 @@ public class SpotUtil {
             return findSpotWithBestScoring(bestSpots);
         } else {
             Map.Entry<String, ForecastDTO> entry = bestSpots.entrySet().iterator().next();
-            String spotName = entry.getKey();
-            ForecastDTO spotForecastDTO = entry.getValue();
-            return SpotResponse.builder().spotName(spotName).forecastDTO(spotForecastDTO).build();
+            return SpotResponse.builder().spotName(entry.getKey()).forecastDTO(entry.getValue()).build();
         }
     }
 
@@ -43,6 +41,7 @@ public class SpotUtil {
         Optional<Map.Entry<String, ForecastDTO>> optionalMaxEntry = bestSpotsWithScoring.entrySet()
                 .stream()
                 .max(Comparator.comparing(entry -> entry.getValue().getSpotScoring()));
+//        todo change to stream on optional
         if (optionalMaxEntry.isPresent()) {
             Map.Entry<String, ForecastDTO> maxEntry = optionalMaxEntry.get();
             Map<String, ForecastDTO> mapOfOnlyOneElementOrEmpty = findUniqueScoring(bestSpotsWithScoring);
@@ -63,10 +62,8 @@ public class SpotUtil {
         Map<String, ForecastDTO> result = new HashMap<>();
         if (optionalMaxEntry.isPresent()) {
             ForecastDTO spotForecastDTO = optionalMaxEntry.get().getValue();
-            optionalMaxEntry.get();
-
             for (Map.Entry<String, ForecastDTO> entry : spots.entrySet()) {
-                if (entry.getValue().getSpotScoring().compareTo(spotForecastDTO.getSpotScoring()) == 0) {
+                if (isEntryScoringMatchWithMaxScoreSpot(spotForecastDTO, entry)) {
                     result.put(entry.getKey(), entry.getValue());
                 }
             }
@@ -78,16 +75,21 @@ public class SpotUtil {
         }
     }
 
+    private static boolean isEntryScoringMatchWithMaxScoreSpot(ForecastDTO spotForecastDTO,
+                                                               Map.Entry<String, ForecastDTO> entry) {
+        return entry.getValue().getSpotScoring().compareTo(spotForecastDTO.getSpotScoring()) == 0;
+    }
+
 
     public Map<String, ForecastDTO> calculateSpotsScoring(Map<String, ForecastDTO> spots) {
         spots.entrySet().forEach(entry ->
                 entry.setValue(
-                        ForecastDTO.builder()
-                                .averageTemperature(entry.getValue().getAverageTemperature())
-                                .windSpeed(entry.getValue().getWindSpeed())
-                                .dateTime(entry.getValue().getDateTime())
-                                .spotScoring(calculateSpotScoring(entry.getValue())).build()));
+                        ForecastDTO.builder(entry.getValue()).spotScoring(calculateSpotScoring(entry.getValue())).build()));
         return spots;
+    }
+
+    private Float calculateSpotScoring(ForecastDTO forecastDTO) {
+        return (forecastDTO.getWindSpeed() * 3f) + forecastDTO.getAverageTemperature();
     }
 
     public Map<String, ForecastDTO> findSpotsWithMatchingForecastRequirements(Map<String, ForecastDTO> allSpots) {
@@ -111,10 +113,6 @@ public class SpotUtil {
 
     private boolean checkIfValueIsOutOfGivenRange(Float value, Float firstGivenValue, Float secondGivenValue) {
         return value.compareTo(firstGivenValue) < 0 || value.compareTo(secondGivenValue) > 0;
-    }
-
-    private Float calculateSpotScoring(ForecastDTO forecastDTO) {
-        return (forecastDTO.getWindSpeed() * 3f) + forecastDTO.getAverageTemperature();
     }
 
     public static Builder builder() {

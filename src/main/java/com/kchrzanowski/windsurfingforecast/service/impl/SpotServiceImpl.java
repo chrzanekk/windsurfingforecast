@@ -80,9 +80,9 @@ public class SpotServiceImpl implements SpotService {
     @Override
     public SpotResponse getBestSpot(LocalDate date) {
         Map<String, ForecastDTO> allSpotsByDate = getAllSpotsByDate(date);
-        Map<String, ForecastDTO> allSpotsWithScoring = spotUtil.calculateSpotsScoring(allSpotsByDate);
+        spotUtil.calculateSpotsScoring(allSpotsByDate);
         Map<String, ForecastDTO> bestSpots = spotUtil.findSpotsWithMatchingForecastRequirements(allSpotsByDate);
-        return spotUtil.calculateBestSpot(bestSpots);
+        return spotUtil.findBestSpot(bestSpots);
     }
 
     private Map<String, ForecastDTO> getAllSpotsByDate(LocalDate date) {

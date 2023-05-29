@@ -47,7 +47,7 @@ public class SpotUtilTest {
                 .spotName(SECOND_SPOT_NAME)
                 .forecastDTO(secondDTO).build();
 
-        SpotResponse result = spotUtil.calculateBestSpot(spotsWithScoring);
+        SpotResponse result = spotUtil.findBestSpot(spotsWithScoring);
 
         assertThat(result).isEqualTo(expectedSpotResponse);
     }

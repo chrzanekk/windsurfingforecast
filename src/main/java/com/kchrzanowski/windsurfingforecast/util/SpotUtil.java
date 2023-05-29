@@ -28,7 +28,7 @@ public class SpotUtil {
         maxWindSpeed = builder.maxWindSpeed;
     }
 
-    public SpotResponse calculateBestSpot(Map<String, ForecastDTO> bestSpots) {
+    public SpotResponse findBestSpot(Map<String, ForecastDTO> bestSpots) {
         if (bestSpots.entrySet().size() != 1) {
             return findSpotWithBestScoring(bestSpots);
         } else {
@@ -62,9 +62,7 @@ public class SpotUtil {
                 .max(Comparator.comparing(entry -> entry.getValue().getSpotScoring()));
         Map<String, ForecastDTO> result = new HashMap<>();
         if (optionalMaxEntry.isPresent()) {
-            Map.Entry<String, ForecastDTO> maxEntry = optionalMaxEntry.get();
-            String spotName = maxEntry.getKey();
-            ForecastDTO spotForecastDTO = maxEntry.getValue();
+            ForecastDTO spotForecastDTO = optionalMaxEntry.get().getValue();
             optionalMaxEntry.get();
 
             for (Map.Entry<String, ForecastDTO> entry : spots.entrySet()) {

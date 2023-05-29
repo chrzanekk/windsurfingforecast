@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,16 +43,21 @@ public class ForecastServiceImpl implements ForecastService {
     public ForecastResponse getForecast(SpotDTO spotDTO, LocalDate localDate) {
         log.debug("Request to get forecast for spot by date: {}{}", spotDTO, localDate);
         ForecastResponse forecastResponse = getForecastList(spotDTO);
-        String spotName = forecastResponse.getCityName();
         List<ForecastDTO> forecastDTOList = forecastResponse.getData();
-        List<ForecastDTO> result =
-                forecastDTOList.stream().filter(forecastDTO -> forecastDTO.getDateTime().isEqual(localDate)
-                ).toList();
-        if (!result.isEmpty()) {
+        List<ForecastDTO> result = getForecastListByDate(localDate, forecastDTOList);
+        if (isForecastListPresent(result)) {
             return ForecastResponse.builder().cityName(forecastResponse.getCityName()).data(result).build();
         } else {
             throw new ForecastNotFoundException("Forecast not found or wrong date: " + localDate.toString());
         }
+    }
+
+    private static List<ForecastDTO> getForecastListByDate(LocalDate localDate, List<ForecastDTO> forecastDTOList) {
+        if (isForecastListPresent(forecastDTOList)) {
+            return forecastDTOList.stream().filter(forecastDTO -> forecastDTO.getDateTime().isEqual(localDate)
+            ).toList();
+        }
+        return Collections.emptyList();
     }
 
     private ForecastResponse getForecastList(SpotDTO spotDTO) {
@@ -68,27 +74,24 @@ public class ForecastServiceImpl implements ForecastService {
     }
 
     private String prepareUri(SpotDTO spotDTO) {
-        Double latitude = spotDTO.getLatitude();
-        Double longitude = spotDTO.getLongitude();
-
-
         return UriComponentsBuilder.fromHttpUrl(apiUrl)
-                .queryParam("lat", latitude.toString())
-                .queryParam("lon", longitude.toString())
+                .queryParam("lat", spotDTO.getLatitude().toString())
+                .queryParam("lon", spotDTO.getLongitude().toString())
                 .queryParam("key", apiKey)
                 .encode()
                 .toUriString();
     }
 
     private Map<String, Object> prepareParams(SpotDTO spotDTO) {
-        Double latitude = spotDTO.getLatitude();
-        Double longitude = spotDTO.getLongitude();
-
         Map<String, Object> params = new HashMap<>();
-        params.put("lat", latitude);
-        params.put("lon", longitude);
+        params.put("lat", spotDTO.getLatitude());
+        params.put("lon", spotDTO.getLongitude());
         params.put("key", apiKey);
 
         return params;
+    }
+
+    private static boolean isForecastListPresent(List<ForecastDTO> list) {
+        return list != null && !list.isEmpty();
     }
 }
